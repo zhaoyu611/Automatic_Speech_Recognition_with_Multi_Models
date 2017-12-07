@@ -1,0 +1,1 @@
+0 48231 We apply auditory modeling to computer speech recognition.

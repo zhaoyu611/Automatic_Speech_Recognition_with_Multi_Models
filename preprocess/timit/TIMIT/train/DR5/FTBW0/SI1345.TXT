@@ -1,0 +1,1 @@
+0 36250 Toss a die until an ace appears.

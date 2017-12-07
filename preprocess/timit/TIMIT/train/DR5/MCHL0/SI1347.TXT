@@ -1,0 +1,1 @@
+0 80487 Again, the analyticity of the two curves guarantees that such intervals exist.

@@ -1,0 +1,1 @@
+0 77210 Best solution is to find an area that is predominantly sunlight or shade.

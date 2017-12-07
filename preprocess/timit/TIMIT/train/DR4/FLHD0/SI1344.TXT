@@ -1,0 +1,1 @@
+0 42496 Experiment without a fixed number of trials.

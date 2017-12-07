@@ -1,0 +1,1 @@
+0 66765 Each form represented by the dictionary is looked up in the text-form list.

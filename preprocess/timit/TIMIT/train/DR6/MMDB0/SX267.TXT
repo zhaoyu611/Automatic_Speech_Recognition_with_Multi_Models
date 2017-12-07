@@ -1,0 +1,1 @@
+0 48436 Draw every outer line first, then fill in the interior.

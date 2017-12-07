@@ -1,0 +1,1 @@
+0 37684 If the farm is rented, the rent must be paid.

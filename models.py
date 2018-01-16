@@ -42,9 +42,16 @@ class Stack_Layers_Model(object):
                 stack_cells.append(cell)
 
             mul_cells = tf.contrib.rnn.MultiRNNCell(stack_cells)
+            
+            # only imply dropout for the input and output layer
+            isTrain = self.args.isTrain
+            keep_prob = 1 - self.args.dropout
+            self.inputs = tf.contrib.layers.dropout(self.inputs, keep_prob=keep_prob, is_training=isTrain)           
+
             #use dynamic rnn to get output lists and deprecated the last state
             #output shape: [batch_size, time_steps, num_hidden]
             targets, _ = tf.nn.dynamic_rnn(mul_cells, self.inputs, self.seq_len, dtype=tf.float32)
+            targets = tf.contrib.layers.dropout(targets, keep_prob=keep_prob, is_training=isTrain)
             #define full connect layer
             logits = tf.layers.dense(targets, self.args.num_class)
         return logits
@@ -55,12 +62,26 @@ class Stack_Layers_Model(object):
         """
         with tf.variable_scope("stack_bi-rnn"):
             pre_layer = self.inputs
+            # only imply dropout for the input and output layer
+            isTrain = self.args.isTrain
+            keep_prob = 1 - self.args.dropout
+            pre_layer = tf.contrib.layers.dropout(pre_layer, keep_prob=keep_prob, is_training=isTrain)
+
             for i in range(self.args.num_layer):
                 with tf.variable_scope("layer_{}".format(i)):
                     cell_fw = select_cell(self.args)
                     cell_bw = select_cell(self.args)
                     targets, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, pre_layer, self.seq_len, dtype=tf.float32) 
                     pre_layer = tf.concat(targets, 2) #concat the num_feature of cell_fw and cell_bw
+                    # print("=============")
+                    # print(pre_layer)
+                    # print("=============")
+                    # sum up the feature dim, and get the final per_layer with shape: [time_step, batch_size, num_hidden]
+                    shape = pre_layer.get_shape().as_list()
+                    pre_layer = tf.reshape(pre_layer, [shape[0], shape[1], 2, int(shape[2]/2)])
+                    pre_layer = tf.reduce_sum(pre_layer, 2)
+                    # print("concated layer: {}".format(pre_layer))
+            pre_layer = tf.contrib.layers.dropout(pre_layer, keep_prob=keep_prob, is_training=isTrain)            
             #define full connect layer
             logits = tf.layers.dense(pre_layer, self.args.num_class)
         return logits

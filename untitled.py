@@ -1,11 +1,13 @@
-import time
+import numpy as np
+print(type(None))
+print(type(np.nan))
 
-for _ in range(5):
-    start_time = time.time()
-    x = 1
-    y = 2
-    z = x+y
-    end_time = time.time()
+a = [[1],[2],[3]]
+b = [[4],[5],[6]]
 
-    print(end_time-start_time)
-    
+print(type(a))
+c = []
+c.append(a)
+print(a)
+print(a.append(b))
+print(a)

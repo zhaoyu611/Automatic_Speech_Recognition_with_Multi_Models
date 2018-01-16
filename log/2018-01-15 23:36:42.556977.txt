@@ -1,0 +1,45 @@
+for train mode, epoch: 1, PER: 0.858535153998, run time: 1948.57228398
+for test mode, epoch: 1, PER: 0.779866440938, run time: 3.1092479229
+=================================================
+for train mode, epoch: 2, PER: 0.775827826725, run time: 1943.55468798
+for test mode, epoch: 2, PER: 0.766103404073, run time: 3.78878283501
+=================================================
+for train mode, epoch: 3, PER: 0.62477664753, run time: 1923.30459499
+for test mode, epoch: 3, PER: 0.473228821961, run time: 3.79059696198
+=================================================
+for train mode, epoch: 4, PER: 0.393818971804, run time: 1948.45205688
+for test mode, epoch: 4, PER: 0.341465390072, run time: 3.8178961277
+=================================================
+for train mode, epoch: 5, PER: 0.305096025061, run time: 1929.96921206
+for test mode, epoch: 5, PER: 0.304520430473, run time: 3.3732779026
+=================================================
+for train mode, epoch: 6, PER: 0.266457555298, run time: 1922.05967593
+for test mode, epoch: 6, PER: 0.286867283285, run time: 3.07306003571
+=================================================
+for train mode, epoch: 7, PER: 0.240727030776, run time: 1922.14871001
+for test mode, epoch: 7, PER: 0.281233496677, run time: 3.84604907036
+=================================================
+for train mode, epoch: 8, PER: 0.221749495198, run time: 1911.86455703
+for test mode, epoch: 8, PER: 0.274050989976, run time: 3.89920592308
+=================================================
+for train mode, epoch: 9, PER: 0.205280462383, run time: 1920.980474
+for test mode, epoch: 9, PER: 0.271539792992, run time: 3.68806004524
+=================================================
+for train mode, epoch: 10, PER: 0.191716147794, run time: 1928.04487681
+for test mode, epoch: 10, PER: 0.271043164799, run time: 3.75419402122
+=================================================
+for train mode, epoch: 11, PER: 0.179302637879, run time: 1916.7724092
+for test mode, epoch: 11, PER: 0.271573058115, run time: 3.29435706139
+=================================================
+for train mode, epoch: 12, PER: 0.169184462271, run time: 1918.31630898
+for test mode, epoch: 12, PER: 0.272449562756, run time: 3.1551668644
+=================================================
+for train mode, epoch: 13, PER: 0.160778713464, run time: 1944.16076088
+for test mode, epoch: 13, PER: 0.26910966778, run time: 3.25865387917
+=================================================
+for train mode, epoch: 14, PER: 0.151363700163, run time: 1925.75936103
+for test mode, epoch: 14, PER: 0.268180719362, run time: 5.16534900665
+=================================================
+for train mode, epoch: 15, PER: 0.144147468006, run time: 1956.61132193
+for test mode, epoch: 15, PER: 0.268547948736, run time: 3.48631286621
+=================================================

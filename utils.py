@@ -54,13 +54,14 @@ def sparse_tuple_from(sequences, dtype=np.int32):
 
 
 
-def data_lists_to_batches(inputList, targetList, batchSize, level):
+def data_lists_to_batches(inputList, targetList, batchSize, level, max_timestep):
     ''' padding the input list to a same dimension, integrate all data into batchInputs
         args:
             inputList: [list] a list of input data
             targetList: [list] a list of target data
             batchSize: [int] batch siee
             level: [str] choose 'phn' or 'cha' 
+            max_timestep: [int] the max time step over both train and test dataset
         return:
             batched_data: [tuple] contains (dataBatches, maxLength)
                                   where dataBatches is a list of length (n_samples/batch_size)
@@ -70,10 +71,11 @@ def data_lists_to_batches(inputList, targetList, batchSize, level):
     # dimensions of inputList:batch*39*time_length
 
     nFeatures = inputList[0].shape[0]
-    maxLength = 0
-    for inp in inputList:
-        # find the max time_length
-        maxLength = max(maxLength, inp.shape[1])
+    maxLength = max_timestep
+    # maxLength = 0
+    # for inp in inputList:
+    #     # find the max time_length
+    #     maxLength = max(maxLength, inp.shape[1])
 
     # randIxs is the shuffled index from range(0,len(inputList))
     randIxs = np.random.permutation(len(inputList))
@@ -242,6 +244,10 @@ def output_to_sequence(lmt, type='phn'):
         return seq
     else:
         raise TypeError('mode should be phoneme or character')
+
+
+
+
 
 
 import utils

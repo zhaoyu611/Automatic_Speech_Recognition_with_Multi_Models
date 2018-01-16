@@ -1,1 +1,0 @@
-0 60519 We now generalize these ideas for general binomial experiments.

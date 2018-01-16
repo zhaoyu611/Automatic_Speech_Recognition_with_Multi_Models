@@ -1,1 +1,0 @@
-0 56219 Roy ignored the spurious data points in drawing the graph.

@@ -1,1 +1,0 @@
-0 45773 Don't look for group valuables in a bank vault.

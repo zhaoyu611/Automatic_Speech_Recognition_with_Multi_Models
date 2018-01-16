@@ -42,7 +42,6 @@ class Stack_Layers_Model(object):
                 stack_cells.append(cell)
 
             mul_cells = tf.contrib.rnn.MultiRNNCell(stack_cells)
-            
             # only imply dropout for the input and output layer
             isTrain = self.args.isTrain
             keep_prob = 1 - self.args.dropout

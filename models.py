@@ -19,70 +19,56 @@ class Stack_Layers_Model(object):
         self.seq_len = seq_len
 
 
-    def build_model(self):
-        model_type = self.args.model_type
-        if model_type == 'unidirection':
-            return self.stack_unidirectional_rnn()
-        elif model_type == 'bidirection':
-            return self.stack_bidirectional_rnn()
-        else:
-            raise TypeError('you should specify correct model type!') 
-
-
-
-
-    def stack_unidirectional_rnn(self):
+    def stack_RNN(self):
+        """ 
+            stack multi-layer unidirectional or bidirectional RNN. And residual connection
+            is available option.
+            
+            return:
+                logits: [tensor] the output layer tensor with shape: [batch_size, time_step, num_feature]
         """
-            stack multi-layer of unidirectional rnn
-        """
-        with tf.variable_scope("stack_uni-rnn"):
-            stack_cells = []
-            for i in range(self.args.num_layer):
-                cell = select_cell(self.args)
-                stack_cells.append(cell)
+        isBiRNN = self.args.isBiRNN # a bool to judge bidirectional or unidirectional RNN
+        scope_name = "stack_bi_RNN" if isBiRNN else "stack_uni_RNN"
+        with tf.variable_scope(scope_name):
+            inputs = self.inputs 
+            num_layer = self.args.num_layer
+            # dropout only work for the fisrt and last layers whiling training
+            inputs = tf.contrib.layers.dropout(
+                                                inputs, 
+                                                keep_prob=(1-self.args.dropout), 
+                                                is_training=self.args.isTrain)
+            for i in range(num_layer):
+                with tf.variable_scope("layer_{}".format(i+1)):
 
-            mul_cells = tf.contrib.rnn.MultiRNNCell(stack_cells)
-            # only imply dropout for the input and output layer
-            isTrain = self.args.isTrain
-            keep_prob = 1 - self.args.dropout
-            self.inputs = tf.contrib.layers.dropout(self.inputs, keep_prob=keep_prob, is_training=isTrain)           
-
-            #use dynamic rnn to get output lists and deprecated the last state
-            #output shape: [batch_size, time_steps, num_hidden]
-            targets, _ = tf.nn.dynamic_rnn(mul_cells, self.inputs, self.seq_len, dtype=tf.float32)
-            targets = tf.contrib.layers.dropout(targets, keep_prob=keep_prob, is_training=isTrain)
-            #define full connect layer
-            logits = tf.layers.dense(targets, self.args.num_class)
-        return logits
-
-    def stack_bidirectional_rnn(self):
-        """
-            stack multi-layer of bidirectional rnn
-        """
-        with tf.variable_scope("stack_bi-rnn"):
-            pre_layer = self.inputs
-            # only imply dropout for the input and output layer
-            isTrain = self.args.isTrain
-            keep_prob = 1 - self.args.dropout
-            pre_layer = tf.contrib.layers.dropout(pre_layer, keep_prob=keep_prob, is_training=isTrain)
-
-            for i in range(self.args.num_layer):
-                with tf.variable_scope("layer_{}".format(i)):
-                    cell_fw = select_cell(self.args)
-                    cell_bw = select_cell(self.args)
-                    targets, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, pre_layer, self.seq_len, dtype=tf.float32) 
-                    pre_layer = tf.concat(targets, 2) #concat the num_feature of cell_fw and cell_bw
-                    # print("=============")
-                    # print(pre_layer)
-                    # print("=============")
-                    # sum up the feature dim, and get the final per_layer with shape: [time_step, batch_size, num_hidden]
-                    shape = pre_layer.get_shape().as_list()
-                    pre_layer = tf.reshape(pre_layer, [shape[0], shape[1], 2, int(shape[2]/2)])
-                    pre_layer = tf.reduce_sum(pre_layer, 2)
-                    # print("concated layer: {}".format(pre_layer))
-            pre_layer = tf.contrib.layers.dropout(pre_layer, keep_prob=keep_prob, is_training=isTrain)            
-            #define full connect layer
-            logits = tf.layers.dense(pre_layer, self.args.num_class)
+                    if isBiRNN: # if use bidirectional RNN
+                        cell_fw = select_cell(self.args)
+                        cell_bw = select_cell(self.args)
+                        outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, self.seq_len, dtype=tf.float32)
+                        # add value of cell_fw and cell_bw in dim [num_feature]
+                        outputs = tf.concat(outputs, 2) #concat the num_feature of cell_fw and cell_bw
+                        shape = outputs.get_shape().as_list() #get shape: [batch_size, time_step, num_feature+num_feature]
+                        outputs = tf.reshape(outputs, [shape[0], shape[1], 2, int(shape[2]/2)])
+                        outputs = tf.reduce_sum(outputs, 2) #get shape: [batch_size, time_step, num_feature]
+                    else: #if use unidirectional RNN
+                        cell = select_cell(self.args)
+                        outputs, _ = tf.nn.dynamic_rnn(cell, inputs, self.seq_len, dtype=tf.float32)
+                    
+                    # calculate next layer's inputs
+                    if self.args.isResNet and i != 0:
+                        with tf.variable_scope("ResNet_in_layer_{}".format(i+1)): 
+                            assert inputs.get_shape().as_list() == outputs.get_shape().as_list(), \
+                                   "Please confirm the inputs and outpus have the same dim for ResNet"
+                            if self.args.num_layer < 3:
+                                print("we highly recommend to use ResNet when hidden layer is larger than 2")
+                            inputs = outputs + inputs  #no residual between the input and output layers
+                    else:
+                        inputs = outputs
+            # dropout only work for the fisrt and last layers whiling training
+            inputs = tf.contrib.layers.dropout(
+                                                inputs, 
+                                                keep_prob=(1-self.args.dropout), 
+                                                is_training=self.args.isTrain) 
+            logits = tf.layers.dense(inputs, self.args.num_class)
         return logits
 
 
